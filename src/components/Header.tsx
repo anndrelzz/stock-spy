@@ -1,9 +1,9 @@
-import { Package, Users } from "lucide-react";
+import { Package, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
-  currentPage: "dashboard" | "products" | "employees";
-  onNavigate: (page: "dashboard" | "products" | "employees") => void;
+  currentPage: "dashboard" | "products" | "employees" | "movements";
+  onNavigate: (page: "dashboard" | "products" | "employees" | "movements") => void;
 }
 
 const Header = ({ currentPage, onNavigate }: HeaderProps) => {
@@ -36,6 +36,14 @@ const Header = ({ currentPage, onNavigate }: HeaderProps) => {
             >
               <Package className="h-4 w-4 mr-2" />
               Produtos
+            </Button>
+            <Button
+              variant={currentPage === "movements" ? "default" : "ghost"}
+              onClick={() => onNavigate("movements")}
+              className="transition-all"
+            >
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Movimentações
             </Button>
             <Button
               variant={currentPage === "employees" ? "default" : "ghost"}

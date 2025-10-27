@@ -18,3 +18,13 @@ export interface Employee {
   email: string;
   registeredAt: string;
 }
+
+export interface ProductMovement {
+  id: string;
+  productName: string;
+  type: "entrada" | "saida";
+  quantity: number;
+  date: string;
+  time: string;
+  responsible: string;
+}
