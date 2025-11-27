@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { Product } from "@/types";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { mockEmployees } from "@/data/mockData";
+import {useState, useEffect} from "react";
+import {Product} from "@/types";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {mockEmployees} from "@/data/mockData";
 
 interface ProductFormProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ interface ProductFormProps {
   product?: Product;
 }
 
-const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) => {
+const ProductForm = ({isOpen, onClose, onSubmit, product}: ProductFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -24,6 +24,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
     supplier: "",
     registeredBy: mockEmployees[0].name,
     registeredAt: new Date().toISOString().split("T")[0],
+    ID_RFID: "",
   });
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
         supplier: product.supplier,
         registeredBy: product.registeredBy,
         registeredAt: product.registeredAt,
+        ID_RFID: product.ID_RFID || "",
       });
     } else {
       setFormData({
@@ -50,6 +52,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
         supplier: "",
         registeredBy: mockEmployees[0].name,
         registeredAt: new Date().toISOString().split("T")[0],
+        ID_RFID: "",
       });
     }
   }, [product, isOpen]);
@@ -57,7 +60,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const productData = {
-      ...(product && { id: product.id }),
+      ...(product && {id: product.id}),
       name: formData.name,
       category: formData.category,
       size: formData.size,
@@ -67,6 +70,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
       supplier: formData.supplier,
       registeredBy: formData.registeredBy,
       registeredAt: formData.registeredAt,
+      ID_RFID: formData.ID_RFID,
     };
     onSubmit(productData as Product);
   };
@@ -75,13 +79,9 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-foreground">
-            {product ? "Editar Produto" : "Cadastrar Novo Produto"}
-          </DialogTitle>
+          <DialogTitle className="text-2xl text-foreground">{product ? "Editar Produto" : "Cadastrar Novo Produto"}</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {product
-              ? "Atualize as informações do produto abaixo"
-              : "Preencha os dados do novo produto para adicioná-lo ao estoque"}
+            {product ? "Atualize as informações do produto abaixo" : "Preencha os dados do novo produto para adicioná-lo ao estoque"}
           </DialogDescription>
         </DialogHeader>
 
@@ -92,7 +92,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
                 required
                 placeholder="Ex: Camiseta Básica"
               />
@@ -103,7 +103,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
               <Input
                 id="category"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) => setFormData({...formData, category: e.target.value})}
                 required
                 placeholder="Ex: Camisetas"
               />
@@ -114,7 +114,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
               <Input
                 id="size"
                 value={formData.size}
-                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                onChange={(e) => setFormData({...formData, size: e.target.value})}
                 required
                 placeholder="Ex: M, 38, P"
               />
@@ -125,7 +125,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
               <Input
                 id="color"
                 value={formData.color}
-                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                onChange={(e) => setFormData({...formData, color: e.target.value})}
                 required
                 placeholder="Ex: Azul"
               />
@@ -138,7 +138,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
                 type="number"
                 min="0"
                 value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                onChange={(e) => setFormData({...formData, quantity: e.target.value})}
                 required
                 placeholder="Ex: 100"
               />
@@ -152,7 +152,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
                 step="0.01"
                 min="0"
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                onChange={(e) => setFormData({...formData, price: e.target.value})}
                 required
                 placeholder="Ex: 29.90"
               />
@@ -163,9 +163,22 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
               <Input
                 id="supplier"
                 value={formData.supplier}
-                onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                onChange={(e) => setFormData({...formData, supplier: e.target.value})}
                 required
                 placeholder="Ex: Confecções Lima"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="IDRFID">ID RFID</Label>
+              <Input
+                id="IDRFID"
+                type="number"
+                min="0"
+                value={formData.IDRFID}
+                onChange={(e) => setFormData({...formData, IDRFID: e.target.value})}
+                required
+                placeholder="Ex: 100"
               />
             </div>
 
@@ -174,7 +187,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, product }: ProductFormProps) =
               <select
                 id="registeredBy"
                 value={formData.registeredBy}
-                onChange={(e) => setFormData({ ...formData, registeredBy: e.target.value })}
+                onChange={(e) => setFormData({...formData, registeredBy: e.target.value})}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 required
               >

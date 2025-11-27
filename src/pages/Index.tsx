@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import Header from "@/components/Header";
 import Dashboard from "@/components/Dashboard";
 import ProductsList from "@/components/ProductsList";
@@ -11,7 +11,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header currentPage={currentPage} onNavigate={setCurrentPage} />
-      
+
       <main className="container mx-auto px-4 py-8">
         {currentPage === "dashboard" && <Dashboard />}
         {currentPage === "products" && <ProductsList />}
@@ -21,7 +21,7 @@ const Index = () => {
 
       <footer className="bg-card border-t border-border mt-16">
         <div className="container mx-auto px-4 py-6 text-center text-muted-foreground">
-          <p>© 2024 EstoqueSpy - Sistema de Gerenciamento de Estoque</p>
+          <p>© 2025 EstoqueSpy - Sistema de Gerenciamento de Estoque</p>
         </div>
       </footer>
     </div>

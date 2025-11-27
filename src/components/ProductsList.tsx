@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Product } from "@/types";
-import { mockProducts as initialProducts } from "@/data/mockData";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Package } from "lucide-react";
+import {useState} from "react";
+import {Product} from "@/types";
+import {mockProducts as initialProducts} from "@/data/mockData";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Badge} from "@/components/ui/badge";
+import {Plus, Search, Pencil, Trash2, Package} from "lucide-react";
 import ProductForm from "./ProductForm";
-import { toast } from "sonner";
+import {toast} from "sonner";
 
 const ProductsList = () => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -15,11 +15,12 @@ const ProductsList = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddProduct = (product: Omit<Product, "id">) => {
@@ -85,7 +86,10 @@ const ProductsList = () => {
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map((product) => (
-          <Card key={product.id} className="shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-soft)] transition-all duration-300 border-border bg-card">
+          <Card
+            key={product.id}
+            className="shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-soft)] transition-all duration-300 border-border bg-card"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
@@ -121,30 +125,19 @@ const ProductsList = () => {
                   <p className="font-medium text-foreground truncate">{product.supplier}</p>
                 </div>
               </div>
-              
+
               <div className="pt-2 border-t border-border">
                 <p className="text-xs text-muted-foreground">
-                  Cadastrado por {product.registeredBy} em{" "}
-                  {new Date(product.registeredAt).toLocaleDateString("pt-BR")}
+                  Cadastrado por {product.registeredBy} em {new Date(product.registeredAt).toLocaleDateString("pt-BR")}
                 </p>
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => openEditForm(product)}
-                >
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => openEditForm(product)}>
                   <Pencil className="h-3.5 w-3.5 mr-1.5" />
                   Editar
                 </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => handleDeleteProduct(product.id)}
-                >
+                <Button variant="destructive" size="sm" className="flex-1" onClick={() => handleDeleteProduct(product.id)}>
                   <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                   Excluir
                 </Button>
