@@ -9,7 +9,7 @@ export interface Product {
   supplier: string;
   registeredBy: string;
   registeredAt: string;
-  IDRFID: number;
+  IDRFID: string;
 }
 
 export interface Employee {

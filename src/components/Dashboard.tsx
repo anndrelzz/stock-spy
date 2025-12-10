@@ -1,16 +1,40 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Users, TrendingUp, Shield } from "lucide-react";
-import { mockProducts, mockEmployees } from "@/data/mockData";
+import { mockEmployees } from "@/data/mockData"; // Mantemos mock apenas para funcionários por enquanto
+import { Product } from "@/types";
 
 const Dashboard = () => {
-  const totalProducts = mockProducts.reduce((sum, p) => sum + p.quantity, 0);
-  const totalValue = mockProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    // Função para buscar dados reais da API
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/api/products");
+        const data = await res.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Erro ao carregar dashboard", error);
+      }
+    };
+
+    fetchData(); // Busca inicial
+
+    // Atualiza a cada 5 segundos (Polling) para pegar as alterações do RFID
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Cálculos baseados nos dados reais vindos do backend
+  const totalProducts = products.reduce((sum, p) => sum + p.quantity, 0);
+  const totalValue = products.reduce((sum, p) => sum + (p.quantity * p.price), 0);
   
   const stats = [
     {
       title: "Total de Produtos",
       value: totalProducts.toString(),
-      description: `${mockProducts.length} produtos cadastrados`,
+      description: `${products.length} produtos cadastrados`,
       icon: Package,
       gradient: "from-primary to-accent",
     },

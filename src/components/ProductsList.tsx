@@ -1,49 +1,104 @@
-import {useState} from "react";
-import {Product} from "@/types";
-import {mockProducts as initialProducts} from "@/data/mockData";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Badge} from "@/components/ui/badge";
-import {Plus, Search, Pencil, Trash2, Package} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Product } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Search, Pencil, Trash2, Package } from "lucide-react";
 import ProductForm from "./ProductForm";
-import {toast} from "sonner";
+import { toast } from "sonner";
+
+const API_URL = "http://localhost:3001/api/products";
 
 const ProductsList = () => {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // --- BUSCAR PRODUTOS (GET) ---
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      setProducts(data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+      toast.error("Erro ao conectar com o servidor.");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    const interval = setInterval(fetchProducts, 2000); // Atualiza a cada 2s
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- CRIAR PRODUTO (POST) ---
+  const handleAddProduct = async (product: Omit<Product, "id">) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      });
+
+      if (!response.ok) throw new Error("Falha ao criar");
+      
+      toast.success("Produto cadastrado com sucesso!");
+      fetchProducts(); // Recarrega a lista
+      setIsFormOpen(false);
+    } catch (error) {
+      toast.error("Erro ao cadastrar produto");
+    }
+  };
+
+  // --- EDITAR PRODUTO (PUT) ---
+  const handleEditProduct = async (product: Product) => {
+    try {
+      const response = await fetch(`${API_URL}/${product.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      });
+
+      if (!response.ok) throw new Error("Falha ao editar");
+
+      toast.success("Produto atualizado com sucesso!");
+      fetchProducts();
+      setIsFormOpen(false);
+      setEditingProduct(undefined);
+    } catch (error) {
+      toast.error("Erro ao atualizar produto");
+    }
+  };
+
+  // --- EXCLUIR PRODUTO (DELETE) ---
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Tem a certeza que deseja excluir este produto?")) return;
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Falha ao excluir");
+
+      toast.success("Produto excluído com sucesso!");
+      fetchProducts();
+    } catch (error) {
+      toast.error("Erro ao excluir produto");
+    }
+  };
 
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleAddProduct = (product: Omit<Product, "id">) => {
-    const newProduct = {
-      ...product,
-      id: Date.now().toString(),
-    };
-    setProducts([newProduct, ...products]);
-    setIsFormOpen(false);
-    toast.success("Produto cadastrado com sucesso!");
-  };
-
-  const handleEditProduct = (product: Product) => {
-    setProducts(products.map((p) => (p.id === product.id ? product : p)));
-    setIsFormOpen(false);
-    setEditingProduct(undefined);
-    toast.success("Produto atualizado com sucesso!");
-  };
-
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter((p) => p.id !== id));
-    toast.success("Produto excluído com sucesso!");
-  };
 
   const openEditForm = (product: Product) => {
     setEditingProduct(product);
@@ -57,12 +112,11 @@ const ProductsList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-2">Gerenciamento de Produtos</h2>
           <p className="text-muted-foreground">
-            {filteredProducts.length} {filteredProducts.length === 1 ? "produto encontrado" : "produtos encontrados"}
+            {isLoading ? "A carregar..." : `${filteredProducts.length} produtos encontrados`}
           </p>
         </div>
         <Button onClick={() => setIsFormOpen(true)} className="shadow-md">
@@ -71,7 +125,6 @@ const ProductsList = () => {
         </Button>
       </div>
 
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -83,13 +136,9 @@ const ProductsList = () => {
         />
       </div>
 
-      {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map((product) => (
-          <Card
-            key={product.id}
-            className="shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-soft)] transition-all duration-300 border-border bg-card"
-          >
+          <Card key={product.id} className="shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-soft)] transition-all duration-300 border-border bg-card">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
@@ -101,6 +150,7 @@ const ProductsList = () => {
                     <div className="flex flex-wrap gap-1.5">
                       <Badge variant="secondary">{product.category}</Badge>
                       <Badge variant="outline">{product.size}</Badge>
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">TAG: {product.IDRFID}</Badge>
                     </div>
                   </div>
                 </div>
@@ -114,22 +164,16 @@ const ProductsList = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Quantidade:</span>
-                  <p className="font-medium text-foreground">{product.quantity}</p>
+                  <p className="font-bold text-lg text-foreground transition-all duration-300">{product.quantity}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Preço:</span>
-                  <p className="font-medium text-foreground">R$ {product.price.toFixed(2)}</p>
+                  <p className="font-medium text-foreground">R$ {Number(product.price).toFixed(2)}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Fornecedor:</span>
                   <p className="font-medium text-foreground truncate">{product.supplier}</p>
                 </div>
-              </div>
-
-              <div className="pt-2 border-t border-border">
-                <p className="text-xs text-muted-foreground">
-                  Cadastrado por {product.registeredBy} em {new Date(product.registeredAt).toLocaleDateString("pt-BR")}
-                </p>
               </div>
 
               <div className="flex gap-2 pt-2">
@@ -147,17 +191,6 @@ const ProductsList = () => {
         ))}
       </div>
 
-      {filteredProducts.length === 0 && (
-        <Card className="shadow-[var(--shadow-card)] border-border bg-card">
-          <CardContent className="py-12 text-center">
-            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-medium text-foreground mb-1">Nenhum produto encontrado</p>
-            <p className="text-muted-foreground">Tente buscar com outros termos ou cadastre um novo produto</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Product Form Dialog */}
       <ProductForm
         isOpen={isFormOpen}
         onClose={handleCloseForm}
